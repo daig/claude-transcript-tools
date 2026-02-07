@@ -1,0 +1,3357 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/SummaryLine"
+    },
+    {
+      "$ref": "#/$defs/FileHistorySnapshotLine"
+    },
+    {
+      "$ref": "#/$defs/UserLine"
+    },
+    {
+      "$ref": "#/$defs/AssistantLine"
+    },
+    {
+      "$ref": "#/$defs/SystemLine"
+    },
+    {
+      "$ref": "#/$defs/ProgressLine"
+    },
+    {
+      "$ref": "#/$defs/QueueOperationLine"
+    }
+  ],
+  "$defs": {
+    "SummaryLine": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "summary"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "leafUuid": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "summary",
+        "leafUuid"
+      ],
+      "id": "SummaryLine"
+    },
+    "FileHistorySnapshotLine": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "file-history-snapshot"
+        },
+        "messageId": {
+          "type": "string"
+        },
+        "snapshot": {
+          "$ref": "#/$defs/FileHistorySnapshot"
+        },
+        "isSnapshotUpdate": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "messageId",
+        "snapshot",
+        "isSnapshotUpdate"
+      ],
+      "id": "FileHistorySnapshotLine"
+    },
+    "FileHistorySnapshot": {
+      "type": "object",
+      "properties": {
+        "messageId": {
+          "type": "string"
+        },
+        "trackedFileBackups": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/FileBackupEntry"
+          }
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "messageId",
+        "trackedFileBackups",
+        "timestamp"
+      ],
+      "id": "FileHistorySnapshot"
+    },
+    "FileBackupEntry": {
+      "type": "object",
+      "properties": {
+        "backupFileName": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "backupTime": {
+          "type": "string"
+        },
+        "version": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "backupFileName",
+        "backupTime",
+        "version"
+      ],
+      "id": "FileBackupEntry"
+    },
+    "UserLine": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/HumanPromptLine"
+        },
+        {
+          "$ref": "#/$defs/ToolResultLine"
+        },
+        {
+          "$ref": "#/$defs/RichContentLine"
+        }
+      ],
+      "id": "UserLine"
+    },
+    "HumanPromptLine": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "user"
+        },
+        "parentUuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isSidechain": {
+          "type": "boolean"
+        },
+        "userType": {
+          "type": "string",
+          "const": "external"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "gitBranch": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "isMeta": {
+          "type": "boolean"
+        },
+        "sourceToolUseID": {
+          "type": "string"
+        },
+        "isVisibleInTranscriptOnly": {
+          "type": "boolean"
+        },
+        "isCompactSummary": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "object",
+          "properties": {
+            "role": {
+              "type": "string",
+              "const": "user"
+            },
+            "content": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "role",
+            "content"
+          ]
+        },
+        "thinkingMetadata": {
+          "$ref": "#/$defs/ThinkingMetadata"
+        },
+        "todos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TodoItem"
+          }
+        },
+        "permissionMode": {
+          "type": "string"
+        },
+        "planContent": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "parentUuid",
+        "isSidechain",
+        "userType",
+        "cwd",
+        "sessionId",
+        "version",
+        "gitBranch",
+        "uuid",
+        "timestamp",
+        "message"
+      ],
+      "additionalProperties": false,
+      "id": "HumanPromptLine"
+    },
+    "ThinkingMetadata": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "maxThinkingTokens": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "maxThinkingTokens"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "level": {
+              "type": "string"
+            },
+            "disabled": {
+              "type": "boolean"
+            },
+            "triggers": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ThinkingTrigger"
+              }
+            }
+          },
+          "required": [
+            "level",
+            "disabled",
+            "triggers"
+          ]
+        }
+      ],
+      "id": "ThinkingMetadata"
+    },
+    "ThinkingTrigger": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "number"
+        },
+        "end": {
+          "type": "number"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "text"
+      ],
+      "id": "ThinkingTrigger"
+    },
+    "TodoItem": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "activeForm": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "content",
+        "status",
+        "activeForm"
+      ],
+      "id": "TodoItem"
+    },
+    "ToolResultLine": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "user"
+        },
+        "parentUuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isSidechain": {
+          "type": "boolean"
+        },
+        "userType": {
+          "type": "string",
+          "const": "external"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "gitBranch": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "isMeta": {
+          "type": "boolean"
+        },
+        "sourceToolUseID": {
+          "type": "string"
+        },
+        "isVisibleInTranscriptOnly": {
+          "type": "boolean"
+        },
+        "isCompactSummary": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "object",
+          "properties": {
+            "role": {
+              "type": "string",
+              "const": "user"
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ToolResultBlock"
+              }
+            }
+          },
+          "required": [
+            "role",
+            "content"
+          ]
+        },
+        "toolUseResult": {
+          "$ref": "#/$defs/ToolUseResult"
+        },
+        "sourceToolAssistantUUID": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "parentUuid",
+        "isSidechain",
+        "userType",
+        "cwd",
+        "sessionId",
+        "version",
+        "gitBranch",
+        "uuid",
+        "timestamp",
+        "message",
+        "toolUseResult",
+        "sourceToolAssistantUUID"
+      ],
+      "additionalProperties": false,
+      "id": "ToolResultLine"
+    },
+    "ToolResultBlock": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PersistedToolResultBlock"
+        },
+        {
+          "$ref": "#/$defs/InlineToolResultBlock"
+        },
+        {
+          "$ref": "#/$defs/ArrayToolResultBlock"
+        }
+      ],
+      "id": "ToolResultBlock"
+    },
+    "PersistedToolResultBlock": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "tool_result"
+        },
+        "tool_use_id": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "is_error": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "tool_use_id",
+        "content"
+      ],
+      "id": "PersistedToolResultBlock"
+    },
+    "InlineToolResultBlock": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "tool_result"
+        },
+        "tool_use_id": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "is_error": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "tool_use_id",
+        "content"
+      ],
+      "id": "InlineToolResultBlock"
+    },
+    "ArrayToolResultBlock": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "tool_result"
+        },
+        "tool_use_id": {
+          "type": "string"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/UserTextBlock"
+              },
+              {
+                "$ref": "#/$defs/UserImageBlock"
+              }
+            ]
+          }
+        },
+        "is_error": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "tool_use_id",
+        "content"
+      ],
+      "id": "ArrayToolResultBlock"
+    },
+    "UserTextBlock": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "text"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "text"
+      ],
+      "id": "UserTextBlock"
+    },
+    "UserImageBlock": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "image"
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "media_type": {
+              "type": "string"
+            },
+            "data": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "media_type",
+            "data"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "source"
+      ],
+      "id": "UserImageBlock"
+    },
+    "ToolUseResult": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BashToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/ReadToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/GlobToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/GrepToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/EditToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/WriteToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/TaskToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/TaskOutputToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/TaskCreateToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/TaskUpdateToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/TaskListToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/TaskStopToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/TodoWriteToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/WebFetchToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/WebSearchToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/AskUserQuestionToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/SkillToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/ExitPlanModeToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/KillShellToolUseResult"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/$defs/McpToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/ExternalToolUseResult"
+        }
+      ],
+      "id": "ToolUseResult"
+    },
+    "BashToolUseResult": {
+      "type": "object",
+      "properties": {
+        "stdout": {
+          "type": "string"
+        },
+        "stderr": {
+          "type": "string"
+        },
+        "interrupted": {
+          "type": "boolean"
+        },
+        "isImage": {
+          "type": "boolean"
+        },
+        "returnCodeInterpretation": {
+          "type": "string"
+        },
+        "backgroundTaskId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "stdout",
+        "stderr",
+        "interrupted",
+        "isImage"
+      ],
+      "id": "BashToolUseResult"
+    },
+    "ReadToolUseResult": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ReadTextToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/ReadImageToolUseResult"
+        }
+      ],
+      "id": "ReadToolUseResult"
+    },
+    "ReadTextToolUseResult": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "text"
+        },
+        "file": {
+          "type": "object",
+          "properties": {
+            "filePath": {
+              "type": "string"
+            },
+            "content": {
+              "type": "string"
+            },
+            "numLines": {
+              "type": "number"
+            },
+            "startLine": {
+              "type": "number"
+            },
+            "totalLines": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "filePath",
+            "content",
+            "numLines",
+            "startLine",
+            "totalLines"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "file"
+      ],
+      "id": "ReadTextToolUseResult"
+    },
+    "ReadImageToolUseResult": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "image"
+        },
+        "file": {
+          "type": "object",
+          "properties": {
+            "base64": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "base64"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "file"
+      ],
+      "id": "ReadImageToolUseResult"
+    },
+    "GlobToolUseResult": {
+      "type": "object",
+      "properties": {
+        "filenames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "durationMs": {
+          "type": "number"
+        },
+        "numFiles": {
+          "type": "number"
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "filenames",
+        "durationMs",
+        "numFiles",
+        "truncated"
+      ],
+      "id": "GlobToolUseResult"
+    },
+    "GrepToolUseResult": {
+      "type": "object",
+      "properties": {
+        "filenames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mode": {
+          "type": "string"
+        },
+        "numFiles": {
+          "type": "number"
+        },
+        "content": {
+          "type": "string"
+        },
+        "numLines": {
+          "type": "number"
+        },
+        "numMatches": {
+          "type": "number"
+        },
+        "appliedLimit": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "filenames",
+        "mode",
+        "numFiles"
+      ],
+      "id": "GrepToolUseResult"
+    },
+    "EditToolUseResult": {
+      "type": "object",
+      "properties": {
+        "filePath": {
+          "type": "string"
+        },
+        "oldString": {
+          "type": "string"
+        },
+        "newString": {
+          "type": "string"
+        },
+        "originalFile": {
+          "type": "string"
+        },
+        "replaceAll": {
+          "type": "boolean"
+        },
+        "structuredPatch": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PatchHunk"
+          }
+        },
+        "userModified": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "filePath",
+        "oldString",
+        "newString",
+        "originalFile",
+        "replaceAll",
+        "structuredPatch",
+        "userModified"
+      ],
+      "id": "EditToolUseResult"
+    },
+    "PatchHunk": {
+      "type": "object",
+      "properties": {
+        "oldStart": {
+          "type": "number"
+        },
+        "oldLines": {
+          "type": "number"
+        },
+        "newStart": {
+          "type": "number"
+        },
+        "newLines": {
+          "type": "number"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "oldStart",
+        "oldLines",
+        "newStart",
+        "newLines",
+        "lines"
+      ],
+      "id": "PatchHunk"
+    },
+    "WriteToolUseResult": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "create"
+        },
+        "filePath": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "originalFile": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "structuredPatch": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PatchHunk"
+          }
+        }
+      },
+      "required": [
+        "type",
+        "filePath",
+        "content",
+        "originalFile",
+        "structuredPatch"
+      ],
+      "id": "WriteToolUseResult"
+    },
+    "TaskToolUseResult": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TaskSyncToolUseResult"
+        },
+        {
+          "$ref": "#/$defs/TaskAsyncToolUseResult"
+        }
+      ],
+      "id": "TaskToolUseResult"
+    },
+    "TaskSyncToolUseResult": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "const": "completed"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TextBlock"
+          }
+        },
+        "totalDurationMs": {
+          "type": "number"
+        },
+        "totalTokens": {
+          "type": "number"
+        },
+        "totalToolUseCount": {
+          "type": "number"
+        },
+        "usage": {
+          "$ref": "#/$defs/Usage"
+        }
+      },
+      "required": [
+        "status",
+        "prompt",
+        "agentId",
+        "content",
+        "totalDurationMs",
+        "totalTokens",
+        "totalToolUseCount",
+        "usage"
+      ],
+      "id": "TaskSyncToolUseResult"
+    },
+    "TextBlock": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "text"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "text"
+      ],
+      "id": "TextBlock"
+    },
+    "Usage": {
+      "type": "object",
+      "properties": {
+        "input_tokens": {
+          "type": "number"
+        },
+        "cache_creation_input_tokens": {
+          "type": "number"
+        },
+        "cache_read_input_tokens": {
+          "type": "number"
+        },
+        "cache_creation": {
+          "$ref": "#/$defs/CacheCreation"
+        },
+        "output_tokens": {
+          "type": "number"
+        },
+        "service_tier": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "inference_geo": {
+          "type": "string"
+        },
+        "server_tool_use": {
+          "$ref": "#/$defs/ServerToolUse"
+        }
+      },
+      "required": [
+        "input_tokens",
+        "cache_creation_input_tokens",
+        "cache_read_input_tokens",
+        "output_tokens"
+      ],
+      "id": "Usage"
+    },
+    "CacheCreation": {
+      "type": "object",
+      "properties": {
+        "ephemeral_5m_input_tokens": {
+          "type": "number"
+        },
+        "ephemeral_1h_input_tokens": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "ephemeral_5m_input_tokens",
+        "ephemeral_1h_input_tokens"
+      ],
+      "id": "CacheCreation"
+    },
+    "ServerToolUse": {
+      "type": "object",
+      "properties": {
+        "web_search_requests": {
+          "type": "number"
+        },
+        "web_fetch_requests": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "web_search_requests",
+        "web_fetch_requests"
+      ],
+      "id": "ServerToolUse"
+    },
+    "TaskAsyncToolUseResult": {
+      "type": "object",
+      "properties": {
+        "isAsync": {
+          "type": "boolean",
+          "const": true
+        },
+        "status": {
+          "type": "string",
+          "const": "async_launched"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "outputFile": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "isAsync",
+        "status",
+        "agentId",
+        "description",
+        "prompt",
+        "outputFile"
+      ],
+      "id": "TaskAsyncToolUseResult"
+    },
+    "TaskOutputToolUseResult": {
+      "type": "object",
+      "properties": {
+        "retrieval_status": {
+          "type": "string"
+        },
+        "task": {
+          "$ref": "#/$defs/TaskInfo"
+        }
+      },
+      "required": [
+        "retrieval_status",
+        "task"
+      ],
+      "id": "TaskOutputToolUseResult"
+    },
+    "TaskInfo": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AgentTaskInfo"
+        },
+        {
+          "$ref": "#/$defs/BackgroundTaskInfo"
+        }
+      ],
+      "id": "TaskInfo"
+    },
+    "AgentTaskInfo": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "task_type": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "output": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "task_id",
+        "task_type",
+        "status",
+        "description",
+        "output",
+        "prompt",
+        "result"
+      ],
+      "id": "AgentTaskInfo"
+    },
+    "BackgroundTaskInfo": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "task_type": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "output": {
+          "type": "string"
+        },
+        "exitCode": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "task_id",
+        "task_type",
+        "status",
+        "description",
+        "output",
+        "exitCode"
+      ],
+      "id": "BackgroundTaskInfo"
+    },
+    "TaskCreateToolUseResult": {
+      "type": "object",
+      "properties": {
+        "task": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "subject": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "subject"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "task"
+      ],
+      "id": "TaskCreateToolUseResult"
+    },
+    "TaskUpdateToolUseResult": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "taskId": {
+          "type": "string"
+        },
+        "updatedFields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "statusChange": {
+          "type": "object",
+          "properties": {
+            "from": {
+              "type": "string"
+            },
+            "to": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "from",
+            "to"
+          ]
+        }
+      },
+      "required": [
+        "success",
+        "taskId",
+        "updatedFields"
+      ],
+      "id": "TaskUpdateToolUseResult"
+    },
+    "TaskListToolUseResult": {
+      "type": "object",
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TaskListEntry"
+          }
+        }
+      },
+      "required": [
+        "tasks"
+      ],
+      "id": "TaskListToolUseResult"
+    },
+    "TaskListEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "blockedBy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "subject",
+        "status",
+        "blockedBy"
+      ],
+      "id": "TaskListEntry"
+    },
+    "TaskStopToolUseResult": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "task_id": {
+          "type": "string"
+        },
+        "task_type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "message",
+        "task_id",
+        "task_type"
+      ],
+      "id": "TaskStopToolUseResult"
+    },
+    "TodoWriteToolUseResult": {
+      "type": "object",
+      "properties": {
+        "oldTodos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TodoItem"
+          }
+        },
+        "newTodos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TodoItem"
+          }
+        }
+      },
+      "required": [
+        "oldTodos",
+        "newTodos"
+      ],
+      "id": "TodoWriteToolUseResult"
+    },
+    "WebFetchToolUseResult": {
+      "type": "object",
+      "properties": {
+        "bytes": {
+          "type": "number"
+        },
+        "code": {
+          "type": "number"
+        },
+        "codeText": {
+          "type": "string"
+        },
+        "durationMs": {
+          "type": "number"
+        },
+        "result": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytes",
+        "code",
+        "codeText",
+        "durationMs",
+        "result",
+        "url"
+      ],
+      "id": "WebFetchToolUseResult"
+    },
+    "WebSearchToolUseResult": {
+      "type": "object",
+      "properties": {
+        "durationSeconds": {
+          "type": "number"
+        },
+        "query": {
+          "type": "string"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WebSearchResultItem"
+          }
+        }
+      },
+      "required": [
+        "durationSeconds",
+        "query",
+        "results"
+      ],
+      "id": "WebSearchToolUseResult"
+    },
+    "WebSearchResultItem": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/$defs/WebSearchStructuredResult"
+        }
+      ],
+      "id": "WebSearchResultItem"
+    },
+    "WebSearchStructuredResult": {
+      "type": "object",
+      "properties": {
+        "tool_use_id": {
+          "type": "string"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WebSearchResultLink"
+          }
+        }
+      },
+      "required": [
+        "tool_use_id",
+        "content"
+      ],
+      "id": "WebSearchStructuredResult"
+    },
+    "WebSearchResultLink": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "url"
+      ],
+      "id": "WebSearchResultLink"
+    },
+    "AskUserQuestionToolUseResult": {
+      "type": "object",
+      "properties": {
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/QuestionSpec"
+          }
+        },
+        "answers": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "questions",
+        "answers"
+      ],
+      "id": "AskUserQuestionToolUseResult"
+    },
+    "QuestionSpec": {
+      "type": "object",
+      "properties": {
+        "question": {
+          "type": "string"
+        },
+        "header": {
+          "type": "string"
+        },
+        "multiSelect": {
+          "type": "boolean"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/QuestionOption"
+          }
+        }
+      },
+      "required": [
+        "question",
+        "header",
+        "multiSelect",
+        "options"
+      ],
+      "id": "QuestionSpec"
+    },
+    "QuestionOption": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "description"
+      ],
+      "id": "QuestionOption"
+    },
+    "SkillToolUseResult": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "commandName": {
+          "type": "string"
+        },
+        "allowedTools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "success",
+        "commandName"
+      ],
+      "id": "SkillToolUseResult"
+    },
+    "ExitPlanModeToolUseResult": {
+      "type": "object",
+      "properties": {
+        "filePath": {
+          "type": "string"
+        },
+        "isAgent": {
+          "type": "boolean"
+        },
+        "plan": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "filePath",
+        "isAgent",
+        "plan"
+      ],
+      "id": "ExitPlanModeToolUseResult"
+    },
+    "KillShellToolUseResult": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "shell_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "message",
+        "shell_id"
+      ],
+      "id": "KillShellToolUseResult"
+    },
+    "McpToolUseResult": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/McpContentBlock"
+      },
+      "id": "McpToolUseResult"
+    },
+    "McpContentBlock": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/McpTextContent"
+        },
+        {
+          "$ref": "#/$defs/McpImageContent"
+        },
+        {
+          "$ref": "#/$defs/McpAudioContent"
+        },
+        {
+          "$ref": "#/$defs/McpResourceLink"
+        },
+        {
+          "$ref": "#/$defs/McpEmbeddedResource"
+        }
+      ],
+      "id": "McpContentBlock"
+    },
+    "McpTextContent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "text"
+        },
+        "text": {
+          "type": "string"
+        },
+        "annotations": {
+          "$ref": "#/$defs/McpAnnotations"
+        }
+      },
+      "required": [
+        "type",
+        "text"
+      ],
+      "id": "McpTextContent"
+    },
+    "McpAnnotations": {
+      "type": "object",
+      "properties": {
+        "audience": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant"
+            ]
+          }
+        },
+        "priority": {
+          "type": "number"
+        },
+        "lastModified": {
+          "type": "string"
+        }
+      },
+      "id": "McpAnnotations"
+    },
+    "McpImageContent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "image"
+        },
+        "data": {
+          "type": "string"
+        },
+        "mimeType": {
+          "type": "string"
+        },
+        "annotations": {
+          "$ref": "#/$defs/McpAnnotations"
+        }
+      },
+      "required": [
+        "type",
+        "data",
+        "mimeType"
+      ],
+      "id": "McpImageContent"
+    },
+    "McpAudioContent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "audio"
+        },
+        "data": {
+          "type": "string"
+        },
+        "mimeType": {
+          "type": "string"
+        },
+        "annotations": {
+          "$ref": "#/$defs/McpAnnotations"
+        }
+      },
+      "required": [
+        "type",
+        "data",
+        "mimeType"
+      ],
+      "id": "McpAudioContent"
+    },
+    "McpResourceLink": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "resource_link"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "mimeType": {
+          "type": "string"
+        },
+        "annotations": {
+          "$ref": "#/$defs/McpAnnotations"
+        }
+      },
+      "required": [
+        "type",
+        "uri",
+        "name"
+      ],
+      "id": "McpResourceLink"
+    },
+    "McpEmbeddedResource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "resource"
+        },
+        "resource": {
+          "type": "object",
+          "properties": {
+            "uri": {
+              "type": "string"
+            },
+            "mimeType": {
+              "type": "string"
+            },
+            "text": {
+              "type": "string"
+            },
+            "blob": {
+              "type": "string"
+            },
+            "annotations": {
+              "$ref": "#/$defs/McpAnnotations"
+            }
+          },
+          "required": [
+            "uri"
+          ]
+        },
+        "annotations": {
+          "$ref": "#/$defs/McpAnnotations"
+        }
+      },
+      "required": [
+        "type",
+        "resource"
+      ],
+      "id": "McpEmbeddedResource"
+    },
+    "ExternalToolUseResult": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {},
+      "id": "ExternalToolUseResult"
+    },
+    "RichContentLine": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "user"
+        },
+        "parentUuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isSidechain": {
+          "type": "boolean"
+        },
+        "userType": {
+          "type": "string",
+          "const": "external"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "gitBranch": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "isMeta": {
+          "type": "boolean"
+        },
+        "sourceToolUseID": {
+          "type": "string"
+        },
+        "isVisibleInTranscriptOnly": {
+          "type": "boolean"
+        },
+        "isCompactSummary": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "object",
+          "properties": {
+            "role": {
+              "type": "string",
+              "const": "user"
+            },
+            "content": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/UserContentBlock"
+              }
+            }
+          },
+          "required": [
+            "role",
+            "content"
+          ]
+        },
+        "sourceToolAssistantUUID": {
+          "type": "string"
+        },
+        "thinkingMetadata": {
+          "$ref": "#/$defs/ThinkingMetadata"
+        },
+        "todos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TodoItem"
+          }
+        },
+        "permissionMode": {
+          "type": "string"
+        },
+        "imagePasteIds": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      },
+      "required": [
+        "type",
+        "parentUuid",
+        "isSidechain",
+        "userType",
+        "cwd",
+        "sessionId",
+        "version",
+        "gitBranch",
+        "uuid",
+        "timestamp",
+        "message"
+      ],
+      "additionalProperties": false,
+      "id": "RichContentLine"
+    },
+    "UserContentBlock": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ToolResultBlock"
+        },
+        {
+          "$ref": "#/$defs/UserTextBlock"
+        },
+        {
+          "$ref": "#/$defs/UserImageBlock"
+        }
+      ],
+      "id": "UserContentBlock"
+    },
+    "AssistantLine": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "assistant"
+        },
+        "parentUuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isSidechain": {
+          "type": "boolean"
+        },
+        "userType": {
+          "type": "string",
+          "const": "external"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "gitBranch": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "message": {
+          "$ref": "#/$defs/AssistantMessage"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string"
+        },
+        "isApiErrorMessage": {
+          "type": "boolean"
+        },
+        "apiError": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "parentUuid",
+        "isSidechain",
+        "userType",
+        "cwd",
+        "sessionId",
+        "version",
+        "gitBranch",
+        "uuid",
+        "timestamp",
+        "message"
+      ],
+      "additionalProperties": false,
+      "id": "AssistantLine"
+    },
+    "AssistantMessage": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "const": "message"
+        },
+        "role": {
+          "type": "string",
+          "const": "assistant"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ContentBlock"
+          }
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stop_sequence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "usage": {
+          "$ref": "#/$defs/Usage"
+        }
+      },
+      "required": [
+        "model",
+        "id",
+        "type",
+        "role",
+        "content",
+        "stop_reason",
+        "stop_sequence",
+        "usage"
+      ],
+      "id": "AssistantMessage"
+    },
+    "ContentBlock": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/TextBlock"
+        },
+        {
+          "$ref": "#/$defs/ThinkingBlock"
+        },
+        {
+          "$ref": "#/$defs/ToolUseBlock"
+        },
+        {
+          "$ref": "#/$defs/RedactedThinkingBlock"
+        }
+      ],
+      "id": "ContentBlock"
+    },
+    "ThinkingBlock": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "thinking"
+        },
+        "thinking": {
+          "type": "string"
+        },
+        "signature": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "thinking",
+        "signature"
+      ],
+      "id": "ThinkingBlock"
+    },
+    "ToolUseBlock": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "tool_use"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "input": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "name",
+        "input"
+      ],
+      "id": "ToolUseBlock"
+    },
+    "RedactedThinkingBlock": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "redacted_thinking"
+        },
+        "data": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "data"
+      ],
+      "id": "RedactedThinkingBlock"
+    },
+    "SystemLine": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TurnDurationSystem"
+        },
+        {
+          "$ref": "#/$defs/ApiErrorSystem"
+        },
+        {
+          "$ref": "#/$defs/CompactBoundarySystem"
+        },
+        {
+          "$ref": "#/$defs/MicrocompactBoundarySystem"
+        },
+        {
+          "$ref": "#/$defs/LocalCommandSystem"
+        },
+        {
+          "$ref": "#/$defs/GenericSystem"
+        }
+      ],
+      "id": "SystemLine"
+    },
+    "TurnDurationSystem": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "system"
+        },
+        "subtype": {
+          "type": "string",
+          "const": "turn_duration"
+        },
+        "parentUuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isSidechain": {
+          "type": "boolean"
+        },
+        "userType": {
+          "type": "string",
+          "const": "external"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "gitBranch": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "level": {
+          "type": "string"
+        },
+        "isMeta": {
+          "type": "boolean"
+        },
+        "content": {
+          "type": "string"
+        },
+        "durationMs": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "type",
+        "subtype",
+        "parentUuid",
+        "isSidechain",
+        "userType",
+        "cwd",
+        "sessionId",
+        "version",
+        "gitBranch",
+        "uuid",
+        "timestamp",
+        "isMeta",
+        "durationMs"
+      ],
+      "additionalProperties": false,
+      "id": "TurnDurationSystem"
+    },
+    "ApiErrorSystem": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "system"
+        },
+        "subtype": {
+          "type": "string",
+          "const": "api_error"
+        },
+        "parentUuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isSidechain": {
+          "type": "boolean"
+        },
+        "userType": {
+          "type": "string",
+          "const": "external"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "gitBranch": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "level": {
+          "type": "string"
+        },
+        "isMeta": {
+          "type": "boolean"
+        },
+        "content": {
+          "type": "string"
+        },
+        "error": {
+          "$ref": "#/$defs/ApiError"
+        },
+        "cause": {
+          "$ref": "#/$defs/ApiErrorCause"
+        },
+        "retryInMs": {
+          "type": "number"
+        },
+        "retryAttempt": {
+          "type": "number"
+        },
+        "maxRetries": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "type",
+        "subtype",
+        "parentUuid",
+        "isSidechain",
+        "userType",
+        "cwd",
+        "sessionId",
+        "version",
+        "gitBranch",
+        "uuid",
+        "timestamp"
+      ],
+      "additionalProperties": false,
+      "id": "ApiErrorSystem"
+    },
+    "ApiError": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NetworkApiError"
+        },
+        {
+          "$ref": "#/$defs/AnthropicApiError"
+        },
+        {
+          "$ref": "#/$defs/EmptyError"
+        }
+      ],
+      "id": "ApiError"
+    },
+    "NetworkApiError": {
+      "type": "object",
+      "properties": {
+        "cause": {
+          "type": "object",
+          "properties": {
+            "cause": {
+              "$ref": "#/$defs/NetworkErrorCause"
+            }
+          }
+        }
+      },
+      "required": [
+        "cause"
+      ],
+      "id": "NetworkApiError"
+    },
+    "NetworkErrorCause": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SocketErrorCause"
+        },
+        {
+          "$ref": "#/$defs/SyscallErrorCause"
+        },
+        {
+          "$ref": "#/$defs/TlsErrorCause"
+        }
+      ],
+      "id": "NetworkErrorCause"
+    },
+    "SocketErrorCause": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "socket": {
+          "type": "object",
+          "properties": {
+            "localAddress": {
+              "type": "string"
+            },
+            "localPort": {
+              "type": "number"
+            },
+            "bytesWritten": {
+              "type": "number"
+            },
+            "bytesRead": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "localAddress",
+            "localPort",
+            "bytesWritten",
+            "bytesRead"
+          ],
+          "additionalProperties": {}
+        }
+      },
+      "required": [
+        "name",
+        "code",
+        "socket"
+      ],
+      "id": "SocketErrorCause"
+    },
+    "SyscallErrorCause": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "errno": {
+          "type": "number"
+        },
+        "syscall": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "errno",
+        "syscall"
+      ],
+      "id": "SyscallErrorCause"
+    },
+    "TlsErrorCause": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "library": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "library",
+        "reason"
+      ],
+      "id": "TlsErrorCause"
+    },
+    "AnthropicApiError": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "number"
+        },
+        "headers": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "requestID": {
+          "type": "string"
+        },
+        "error": {
+          "$ref": "#/$defs/AnthropicApiErrorDetail"
+        }
+      },
+      "required": [
+        "status",
+        "headers",
+        "requestID",
+        "error"
+      ],
+      "id": "AnthropicApiError"
+    },
+    "AnthropicApiErrorDetail": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "error"
+        },
+        "error": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "message"
+          ]
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "error",
+        "request_id"
+      ],
+      "id": "AnthropicApiErrorDetail"
+    },
+    "EmptyError": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false,
+      "id": "EmptyError"
+    },
+    "ApiErrorCause": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "cause": {
+              "$ref": "#/$defs/NetworkErrorCause"
+            }
+          },
+          "required": [
+            "cause"
+          ]
+        },
+        {
+          "$ref": "#/$defs/EmptyError"
+        }
+      ],
+      "id": "ApiErrorCause"
+    },
+    "CompactBoundarySystem": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "system"
+        },
+        "subtype": {
+          "type": "string",
+          "const": "compact_boundary"
+        },
+        "parentUuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isSidechain": {
+          "type": "boolean"
+        },
+        "userType": {
+          "type": "string",
+          "const": "external"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "gitBranch": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "level": {
+          "type": "string"
+        },
+        "isMeta": {
+          "type": "boolean"
+        },
+        "content": {
+          "type": "string"
+        },
+        "compactMetadata": {
+          "$ref": "#/$defs/CompactMetadata"
+        },
+        "logicalParentUuid": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "subtype",
+        "parentUuid",
+        "isSidechain",
+        "userType",
+        "cwd",
+        "sessionId",
+        "version",
+        "gitBranch",
+        "uuid",
+        "timestamp"
+      ],
+      "additionalProperties": false,
+      "id": "CompactBoundarySystem"
+    },
+    "CompactMetadata": {
+      "type": "object",
+      "properties": {
+        "trigger": {
+          "type": "string"
+        },
+        "preTokens": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "trigger",
+        "preTokens"
+      ],
+      "id": "CompactMetadata"
+    },
+    "MicrocompactBoundarySystem": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "system"
+        },
+        "subtype": {
+          "type": "string",
+          "const": "microcompact_boundary"
+        },
+        "parentUuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isSidechain": {
+          "type": "boolean"
+        },
+        "userType": {
+          "type": "string",
+          "const": "external"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "gitBranch": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "level": {
+          "type": "string"
+        },
+        "isMeta": {
+          "type": "boolean"
+        },
+        "content": {
+          "type": "string"
+        },
+        "microcompactMetadata": {
+          "$ref": "#/$defs/MicrocompactMetadata"
+        }
+      },
+      "required": [
+        "type",
+        "subtype",
+        "parentUuid",
+        "isSidechain",
+        "userType",
+        "cwd",
+        "sessionId",
+        "version",
+        "gitBranch",
+        "uuid",
+        "timestamp"
+      ],
+      "additionalProperties": false,
+      "id": "MicrocompactBoundarySystem"
+    },
+    "MicrocompactMetadata": {
+      "type": "object",
+      "properties": {
+        "trigger": {
+          "type": "string"
+        },
+        "preTokens": {
+          "type": "number"
+        },
+        "tokensSaved": {
+          "type": "number"
+        },
+        "compactedToolIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "clearedAttachmentUUIDs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "trigger",
+        "preTokens",
+        "tokensSaved",
+        "compactedToolIds",
+        "clearedAttachmentUUIDs"
+      ],
+      "id": "MicrocompactMetadata"
+    },
+    "LocalCommandSystem": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "system"
+        },
+        "subtype": {
+          "type": "string",
+          "const": "local_command"
+        },
+        "parentUuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isSidechain": {
+          "type": "boolean"
+        },
+        "userType": {
+          "type": "string",
+          "const": "external"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "gitBranch": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "level": {
+          "type": "string"
+        },
+        "isMeta": {
+          "type": "boolean"
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "subtype",
+        "parentUuid",
+        "isSidechain",
+        "userType",
+        "cwd",
+        "sessionId",
+        "version",
+        "gitBranch",
+        "uuid",
+        "timestamp"
+      ],
+      "additionalProperties": false,
+      "id": "LocalCommandSystem"
+    },
+    "GenericSystem": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "system"
+        },
+        "subtype": {
+          "type": "string"
+        },
+        "parentUuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isSidechain": {
+          "type": "boolean"
+        },
+        "userType": {
+          "type": "string",
+          "const": "external"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "gitBranch": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "level": {
+          "type": "string"
+        },
+        "isMeta": {
+          "type": "boolean"
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "subtype",
+        "parentUuid",
+        "isSidechain",
+        "userType",
+        "cwd",
+        "sessionId",
+        "version",
+        "gitBranch",
+        "uuid",
+        "timestamp"
+      ],
+      "additionalProperties": {},
+      "id": "GenericSystem"
+    },
+    "ProgressLine": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "progress"
+        },
+        "parentUuid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isSidechain": {
+          "type": "boolean"
+        },
+        "data": {
+          "$ref": "#/$defs/ProgressData"
+        },
+        "toolUseID": {
+          "type": "string"
+        },
+        "parentToolUseID": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "gitBranch": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "userType": {
+          "type": "string",
+          "const": "external"
+        },
+        "version": {
+          "type": "string"
+        },
+        "agentId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "data",
+        "toolUseID",
+        "parentToolUseID",
+        "timestamp",
+        "uuid",
+        "cwd",
+        "gitBranch",
+        "sessionId",
+        "userType",
+        "version"
+      ],
+      "additionalProperties": false,
+      "id": "ProgressLine"
+    },
+    "ProgressData": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/HookProgressData"
+        },
+        {
+          "$ref": "#/$defs/WaitingForTaskData"
+        },
+        {
+          "$ref": "#/$defs/QueryUpdateData"
+        },
+        {
+          "$ref": "#/$defs/BashProgressData"
+        },
+        {
+          "$ref": "#/$defs/AgentProgressData"
+        },
+        {
+          "$ref": "#/$defs/SearchResultsReceivedData"
+        },
+        {
+          "$ref": "#/$defs/McpProgressData"
+        }
+      ],
+      "id": "ProgressData"
+    },
+    "HookProgressData": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "hook_progress"
+        },
+        "hookEvent": {
+          "type": "string"
+        },
+        "hookName": {
+          "type": "string"
+        },
+        "command": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "hookEvent",
+        "hookName",
+        "command"
+      ],
+      "id": "HookProgressData"
+    },
+    "WaitingForTaskData": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "waiting_for_task"
+        },
+        "taskDescription": {
+          "type": "string"
+        },
+        "taskType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "taskDescription",
+        "taskType"
+      ],
+      "id": "WaitingForTaskData"
+    },
+    "QueryUpdateData": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "query_update"
+        },
+        "query": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "query"
+      ],
+      "id": "QueryUpdateData"
+    },
+    "BashProgressData": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "bash_progress"
+        },
+        "output": {
+          "type": "string"
+        },
+        "fullOutput": {
+          "type": "string"
+        },
+        "elapsedTimeSeconds": {
+          "type": "number"
+        },
+        "totalLines": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "type",
+        "output",
+        "fullOutput",
+        "elapsedTimeSeconds",
+        "totalLines"
+      ],
+      "id": "BashProgressData"
+    },
+    "AgentProgressData": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "agent_progress"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": {},
+      "id": "AgentProgressData"
+    },
+    "SearchResultsReceivedData": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "search_results_received"
+        },
+        "resultCount": {
+          "type": "number"
+        },
+        "query": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "resultCount",
+        "query"
+      ],
+      "id": "SearchResultsReceivedData"
+    },
+    "McpProgressData": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "mcp_progress"
+        },
+        "serverName": {
+          "type": "string"
+        },
+        "toolName": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "elapsedTimeMs": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "type",
+        "serverName",
+        "toolName",
+        "status"
+      ],
+      "additionalProperties": false,
+      "id": "McpProgressData"
+    },
+    "QueueOperationLine": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "queue-operation"
+        },
+        "operation": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "operation",
+        "timestamp",
+        "sessionId"
+      ],
+      "id": "QueueOperationLine"
+    },
+    "SessionIndexEntry": {
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "type": "string"
+        },
+        "fullPath": {
+          "type": "string"
+        },
+        "fileMtime": {
+          "type": "number"
+        },
+        "firstPrompt": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "messageCount": {
+          "type": "number"
+        },
+        "created": {
+          "type": "string"
+        },
+        "modified": {
+          "type": "string"
+        },
+        "gitBranch": {
+          "type": "string"
+        },
+        "projectPath": {
+          "type": "string"
+        },
+        "isSidechain": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "sessionId",
+        "fullPath",
+        "fileMtime",
+        "firstPrompt",
+        "summary",
+        "messageCount",
+        "created",
+        "modified",
+        "gitBranch",
+        "projectPath",
+        "isSidechain"
+      ],
+      "id": "SessionIndexEntry"
+    },
+    "SessionIndex": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "number"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SessionIndexEntry"
+          }
+        },
+        "originalPath": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "entries",
+        "originalPath"
+      ],
+      "id": "SessionIndex"
+    },
+    "PastedContent": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/InlinePastedContent"
+        },
+        {
+          "$ref": "#/$defs/HashedPastedContent"
+        }
+      ],
+      "id": "PastedContent"
+    },
+    "InlinePastedContent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "type": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "content"
+      ],
+      "id": "InlinePastedContent"
+    },
+    "HashedPastedContent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "type": {
+          "type": "string"
+        },
+        "contentHash": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "contentHash"
+      ],
+      "id": "HashedPastedContent"
+    },
+    "HistoryEntry": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "display": {
+          "type": "string"
+        },
+        "pastedContents": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/PastedContent"
+          }
+        },
+        "timestamp": {
+          "type": "number"
+        },
+        "project": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "display",
+        "pastedContents",
+        "timestamp",
+        "project"
+      ],
+      "id": "HistoryEntry"
+    }
+  },
+  "title": "Claude Code Session Transcript Line",
+  "description": "Schema for a single JSONL line in a Claude Code session transcript. Each line is one of 7 types: summary, file-history-snapshot, user, assistant, system, progress, or queue-operation."
+}

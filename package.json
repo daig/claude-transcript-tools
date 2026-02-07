@@ -1,0 +1,42 @@
+{
+  "name": "claude-code-transcripts",
+  "version": "0.1.0",
+  "description": "Zod schema, JSON Schema, and documentation for Claude Code JSONL session transcripts",
+  "type": "module",
+  "main": "dist/session-transcript.schema.js",
+  "types": "dist/session-transcript.schema.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/session-transcript.schema.d.ts",
+      "import": "./dist/session-transcript.schema.js"
+    },
+    "./schema.json": "./session-transcript.schema.json"
+  },
+  "files": [
+    "dist",
+    "session-transcript.schema.json",
+    "session-transcript-format.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "generate:schema": "npx tsx generate-json-schema.ts",
+    "validate": "npx tsx validate-transcript.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "claude-code",
+    "anthropic",
+    "transcript",
+    "jsonl",
+    "schema",
+    "zod"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
