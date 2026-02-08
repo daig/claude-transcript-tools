@@ -87,6 +87,34 @@ import {
   McpToolUseResult,
   ToolUseResult,
 
+  // Tool use inputs
+  BashToolInput,
+  ReadToolInput,
+  WriteToolInput,
+  EditToolInput,
+  NotebookEditToolInput,
+  GlobToolInput,
+  GrepToolInput,
+  TaskToolInput,
+  TaskOutputToolInput,
+  TaskCreateToolInput,
+  TaskGetToolInput,
+  TaskUpdateToolInput,
+  TaskListToolInput,
+  TaskStopToolInput,
+  WebFetchToolInput,
+  WebSearchToolInput,
+  AskUserQuestionInputOption,
+  AskUserQuestionInputItem,
+  AskUserQuestionToolInput,
+  SkillToolInput,
+  ExitPlanModeAllowedPrompt,
+  ExitPlanModeToolInput,
+  EnterPlanModeToolInput,
+  TodoWriteToolInput,
+  KillShellToolInput,
+  ExternalToolInput,
+
   // Type 4: assistant
   ThinkingBlock,
   ToolUseBlock,
@@ -143,7 +171,7 @@ import {
 // Register schemas with descriptive IDs for readable $defs
 // ---------------------------------------------------------------------------
 
-const registry: Array<[z.ZodTypeAny, string]> = [
+const registry: Array<[z.ZodTypeAny, string, string?]> = [
   // Line types (top-level)
   [SummaryLine, "SummaryLine"],
   [FileHistorySnapshotLine, "FileHistorySnapshotLine"],
@@ -199,8 +227,8 @@ const registry: Array<[z.ZodTypeAny, string]> = [
   [AskUserQuestionToolUseResult, "AskUserQuestionToolUseResult"],
   [SkillToolUseResult, "SkillToolUseResult"],
   [ExitPlanModeToolUseResult, "ExitPlanModeToolUseResult"],
-  [TodoWriteToolUseResult, "TodoWriteToolUseResult"],
-  [KillShellToolUseResult, "KillShellToolUseResult"],
+  [TodoWriteToolUseResult, "TodoWriteToolUseResult", "Legacy: replaced by TaskCreate/TaskUpdate/TaskList."],
+  [KillShellToolUseResult, "KillShellToolUseResult", "Legacy: replaced by TaskStop."],
   [ExternalToolUseResult, "ExternalToolUseResult"],
   [McpAnnotations, "McpAnnotations"],
   [McpTextContent, "McpTextContent"],
@@ -211,6 +239,34 @@ const registry: Array<[z.ZodTypeAny, string]> = [
   [McpContentBlock, "McpContentBlock"],
   [McpToolUseResult, "McpToolUseResult"],
   [ToolUseResult, "ToolUseResult"],
+
+  // Tool use inputs
+  [BashToolInput, "BashToolInput"],
+  [ReadToolInput, "ReadToolInput"],
+  [WriteToolInput, "WriteToolInput"],
+  [EditToolInput, "EditToolInput"],
+  [NotebookEditToolInput, "NotebookEditToolInput"],
+  [GlobToolInput, "GlobToolInput"],
+  [GrepToolInput, "GrepToolInput"],
+  [TaskToolInput, "TaskToolInput"],
+  [TaskOutputToolInput, "TaskOutputToolInput"],
+  [TaskCreateToolInput, "TaskCreateToolInput"],
+  [TaskGetToolInput, "TaskGetToolInput"],
+  [TaskUpdateToolInput, "TaskUpdateToolInput"],
+  [TaskListToolInput, "TaskListToolInput"],
+  [TaskStopToolInput, "TaskStopToolInput"],
+  [WebFetchToolInput, "WebFetchToolInput"],
+  [WebSearchToolInput, "WebSearchToolInput"],
+  [AskUserQuestionInputOption, "AskUserQuestionInputOption"],
+  [AskUserQuestionInputItem, "AskUserQuestionInputItem"],
+  [AskUserQuestionToolInput, "AskUserQuestionToolInput"],
+  [SkillToolInput, "SkillToolInput"],
+  [ExitPlanModeAllowedPrompt, "ExitPlanModeAllowedPrompt"],
+  [ExitPlanModeToolInput, "ExitPlanModeToolInput"],
+  [EnterPlanModeToolInput, "EnterPlanModeToolInput"],
+  [TodoWriteToolInput, "TodoWriteToolInput", "Legacy: replaced by TaskCreate/TaskUpdate/TaskList."],
+  [KillShellToolInput, "KillShellToolInput", "Legacy: replaced by TaskStop."],
+  [ExternalToolInput, "ExternalToolInput"],
 
   // Shared / auxiliary schemas
   [FileBackupEntry, "FileBackupEntry"],
@@ -266,8 +322,8 @@ const registry: Array<[z.ZodTypeAny, string]> = [
   [HistoryEntry, "HistoryEntry"],
 ];
 
-for (const [schema, id] of registry) {
-  z.globalRegistry.add(schema, { id });
+for (const [schema, id, description] of registry) {
+  z.globalRegistry.add(schema, description ? { id, description } : { id });
 }
 
 // ---------------------------------------------------------------------------

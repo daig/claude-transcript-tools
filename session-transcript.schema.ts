@@ -430,12 +430,13 @@ export const TodoItem = z.object({
   activeForm: z.string(),
 });
 
+/** @deprecated Legacy tool, replaced by TaskCreate/TaskUpdate/TaskList. */
 export const TodoWriteToolUseResult = z.object({
   oldTodos: z.array(TodoItem),
   newTodos: z.array(TodoItem),
 });
 
-/** Legacy tool, replaced by TaskStop. */
+/** @deprecated Legacy tool, replaced by TaskStop. */
 export const KillShellToolUseResult = z.object({
   message: z.string(),
   shell_id: z.string(),
@@ -613,12 +614,239 @@ export const ThinkingBlock = z.object({
   signature: z.string(),
 });
 
-export const ToolUseBlock = z.object({
-  type: z.literal("tool_use"),
-  id: z.string(),
-  name: z.string(),
-  input: z.record(z.string(), z.unknown()),
+// -- Tool use input schemas (built-in tools) --
+
+export const BashToolInput = z.object({
+  command: z.string(),
+  description: z.string().optional(),
+  timeout: z.number().optional(),
+  run_in_background: z.boolean().optional(),
+  dangerouslyDisableSandbox: z.boolean().optional(),
+  _simulatedSedEdit: z
+    .object({
+      filePath: z.string(),
+      newContent: z.string(),
+    })
+    .optional(),
 });
+
+export const ReadToolInput = z.object({
+  file_path: z.string(),
+  offset: z.number().optional(),
+  limit: z.number().optional(),
+  pages: z.string().optional(),
+});
+
+export const WriteToolInput = z.object({
+  file_path: z.string(),
+  content: z.string(),
+});
+
+export const EditToolInput = z.object({
+  file_path: z.string(),
+  old_string: z.string(),
+  new_string: z.string(),
+  replace_all: z.boolean().optional(),
+});
+
+export const NotebookEditToolInput = z.object({
+  notebook_path: z.string(),
+  new_source: z.string(),
+  cell_number: z.number().optional(),
+  cell_type: z.enum(["code", "markdown"]).optional(),
+  edit_mode: z.enum(["replace", "insert", "delete"]).optional(),
+  cell_id: z.string().optional(),
+});
+
+export const GlobToolInput = z.object({
+  pattern: z.string(),
+  path: z.string().optional(),
+});
+
+export const GrepToolInput = z.object({
+  pattern: z.string(),
+  path: z.string().optional(),
+  glob: z.string().optional(),
+  type: z.string().optional(),
+  output_mode: z.enum(["content", "files_with_matches", "count"]).optional(),
+  multiline: z.boolean().optional(),
+  head_limit: z.number().optional(),
+  offset: z.number().optional(),
+  context: z.number().optional(),
+  "-A": z.number().optional(),
+  "-B": z.number().optional(),
+  "-C": z.number().optional(),
+  "-i": z.boolean().optional(),
+  "-n": z.boolean().optional(),
+});
+
+export const TaskToolInput = z.object({
+  prompt: z.string(),
+  subagent_type: z.string(),
+  description: z.string(),
+  model: z.enum(["sonnet", "opus", "haiku"]).optional(),
+  run_in_background: z.boolean().optional(),
+  resume: z.string().optional(),
+  max_turns: z.number().optional(),
+});
+
+export const TaskOutputToolInput = z.object({
+  task_id: z.string(),
+  block: z.boolean().optional(),
+  timeout: z.number().optional(),
+});
+
+export const TaskCreateToolInput = z.object({
+  subject: z.string(),
+  description: z.string(),
+  activeForm: z.string().optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
+
+export const TaskGetToolInput = z.object({
+  taskId: z.string(),
+});
+
+export const TaskUpdateToolInput = z.object({
+  taskId: z.string(),
+  status: z.string().optional(),
+  subject: z.string().optional(),
+  description: z.string().optional(),
+  activeForm: z.string().optional(),
+  owner: z.string().optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+  addBlocks: z.array(z.string()).optional(),
+  addBlockedBy: z.array(z.string()).optional(),
+});
+
+export const TaskListToolInput = z.object({});
+
+export const TaskStopToolInput = z.object({
+  task_id: z.string().optional(),
+  shell_id: z.string().optional(),
+});
+
+export const WebFetchToolInput = z.object({
+  url: z.string(),
+  prompt: z.string(),
+});
+
+export const WebSearchToolInput = z.object({
+  query: z.string(),
+  allowed_domains: z.array(z.string()).optional(),
+  blocked_domains: z.array(z.string()).optional(),
+});
+
+export const AskUserQuestionInputOption = z.object({
+  label: z.string(),
+  description: z.string().optional(),
+});
+
+export const AskUserQuestionInputItem = z.object({
+  question: z.string(),
+  header: z.string().optional(),
+  options: z.array(AskUserQuestionInputOption),
+  multiSelect: z.boolean().optional(),
+});
+
+export const AskUserQuestionToolInput = z.object({
+  questions: z.array(AskUserQuestionInputItem),
+  answers: z.record(z.string(), z.string()).optional(),
+  metadata: z
+    .object({
+      source: z.string().optional(),
+    })
+    .optional(),
+});
+
+export const SkillToolInput = z.object({
+  skill: z.string(),
+  args: z.string().optional(),
+});
+
+export const ExitPlanModeAllowedPrompt = z.object({
+  tool: z.string(),
+  prompt: z.string(),
+});
+
+export const ExitPlanModeToolInput = z.object({
+  allowedPrompts: z.array(ExitPlanModeAllowedPrompt).optional(),
+  pushToRemote: z.boolean().optional(),
+  remoteSessionId: z.string().optional(),
+  remoteSessionUrl: z.string().optional(),
+  remoteSessionTitle: z.string().optional(),
+});
+
+export const EnterPlanModeToolInput = z.object({});
+
+// -- Legacy tool inputs --
+
+/** @deprecated Legacy tool, replaced by TaskCreate/TaskUpdate/TaskList. */
+export const TodoWriteToolInput = z.object({
+  todos: z.array(TodoItem),
+});
+
+/** @deprecated Legacy tool, replaced by TaskStop. */
+export const KillShellToolInput = z.object({
+  shell_id: z.string().optional(),
+});
+
+// -- Fallback for MCP / plugin tools --
+
+/** Input from an MCP server or plugin-provided tool (object shape). */
+export const ExternalToolInput = z.record(z.string(), z.unknown());
+
+// -- Tool name → input schema map --
+
+export const toolInputSchemas: Record<string, z.ZodTypeAny> = {
+  Bash: BashToolInput,
+  Read: ReadToolInput,
+  Write: WriteToolInput,
+  Edit: EditToolInput,
+  NotebookEdit: NotebookEditToolInput,
+  Glob: GlobToolInput,
+  Grep: GrepToolInput,
+  Task: TaskToolInput,
+  TaskOutput: TaskOutputToolInput,
+  TaskCreate: TaskCreateToolInput,
+  TaskGet: TaskGetToolInput,
+  TaskUpdate: TaskUpdateToolInput,
+  TaskList: TaskListToolInput,
+  TaskStop: TaskStopToolInput,
+  WebFetch: WebFetchToolInput,
+  WebSearch: WebSearchToolInput,
+  AskUserQuestion: AskUserQuestionToolInput,
+  Skill: SkillToolInput,
+  ExitPlanMode: ExitPlanModeToolInput,
+  EnterPlanMode: EnterPlanModeToolInput,
+  TodoWrite: TodoWriteToolInput,
+  KillShell: KillShellToolInput,
+};
+
+// -- ToolUseBlock with name↔input correlation via .superRefine() --
+
+export const ToolUseBlock = z
+  .object({
+    type: z.literal("tool_use"),
+    id: z.string(),
+    name: z.string(),
+    input: z.record(z.string(), z.unknown()),
+  })
+  .superRefine((val, ctx) => {
+    const schema = toolInputSchemas[val.name];
+    if (schema) {
+      const result = schema.safeParse(val.input);
+      if (!result.success) {
+        for (const issue of result.error.issues) {
+          ctx.addIssue({
+            ...issue,
+            path: ["input", ...issue.path],
+          });
+        }
+      }
+    }
+    // Unknown tool names (MCP/external) pass through — no schema to check against
+  });
 
 export const RedactedThinkingBlock = z.object({
   type: z.literal("redacted_thinking"),

@@ -1350,7 +1350,8 @@
         "oldTodos",
         "newTodos"
       ],
-      "id": "TodoWriteToolUseResult"
+      "id": "TodoWriteToolUseResult",
+      "description": "Legacy: replaced by TaskCreate/TaskUpdate/TaskList."
     },
     "WebFetchToolUseResult": {
       "type": "object",
@@ -1577,7 +1578,8 @@
         "message",
         "shell_id"
       ],
-      "id": "KillShellToolUseResult"
+      "id": "KillShellToolUseResult",
+      "description": "Legacy: replaced by TaskStop."
     },
     "McpToolUseResult": {
       "type": "array",
