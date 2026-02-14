@@ -770,6 +770,7 @@ export const ExitPlanModeAllowedPrompt = z.object({
 });
 
 export const ExitPlanModeToolInput = z.object({
+  plan: z.string().optional(),
   allowedPrompts: z.array(ExitPlanModeAllowedPrompt).optional(),
   pushToRemote: z.boolean().optional(),
   remoteSessionId: z.string().optional(),
