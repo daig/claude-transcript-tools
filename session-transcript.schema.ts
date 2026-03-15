@@ -202,7 +202,6 @@ export const UserContentBlock = z.union([
 
 // -- toolUseResult shapes (built-in tools) --
 
-/** Structured result from a Bash tool execution. */
 export const BashToolUseResult = z.object({
   /** Standard output from the command. */
   stdout: z.string(),
@@ -220,7 +219,6 @@ export const BashToolUseResult = z.object({
   noOutputExpected: z.boolean().optional(),
 });
 
-/** Result from reading a text file. */
 export const ReadTextToolUseResult = z.object({
   type: z.literal("text"),
   file: z.object({
@@ -236,7 +234,6 @@ export const ReadTextToolUseResult = z.object({
   }),
 });
 
-/** Result from reading an image file (PNG, JPG, etc.). */
 export const ReadImageToolUseResult = z.object({
   type: z.literal("image"),
   file: z.object({
@@ -245,13 +242,11 @@ export const ReadImageToolUseResult = z.object({
   }),
 });
 
-/** Result from the Read tool — either text or image depending on file type. */
 export const ReadToolUseResult = z.union([
   ReadTextToolUseResult,
   ReadImageToolUseResult,
 ]);
 
-/** Result from the Glob tool (file pattern matching). */
 export const GlobToolUseResult = z.object({
   /** Matched file paths, sorted by modification time. */
   filenames: z.array(z.string()),
@@ -263,7 +258,6 @@ export const GlobToolUseResult = z.object({
   truncated: z.boolean(),
 });
 
-/** Result from the Grep tool (content search). */
 export const GrepToolUseResult = z.object({
   /** Matched file paths. */
   filenames: z.array(z.string()),
@@ -295,7 +289,6 @@ export const PatchHunk = z.object({
   lines: z.array(z.string()),
 });
 
-/** Result from the Edit tool (string replacement in a file). */
 export const EditToolUseResult = z.object({
   filePath: z.string(),
   /** The string that was replaced. */
@@ -312,7 +305,6 @@ export const EditToolUseResult = z.object({
   userModified: z.boolean(),
 });
 
-/** Result from the Write tool (file creation). */
 export const WriteToolUseResult = z.object({
   type: z.literal("create"),
   filePath: z.string(),
@@ -324,7 +316,6 @@ export const WriteToolUseResult = z.object({
   structuredPatch: z.array(PatchHunk),
 });
 
-/** A text content block in an API message. */
 export const TextBlock = z.object({
   type: z.literal("text"),
   text: z.string(),
@@ -369,7 +360,6 @@ export const Usage = z.object({
   speed: z.string().nullable().optional(),
 });
 
-/** Result from a synchronous Task (subagent) execution. */
 export const TaskSyncToolUseResult = z.object({
   status: z.literal("completed"),
   /** The prompt that was sent to the subagent. */
@@ -388,7 +378,6 @@ export const TaskSyncToolUseResult = z.object({
   usage: Usage,
 });
 
-/** Result from an asynchronous Task (subagent) launch. */
 export const TaskAsyncToolUseResult = z.object({
   isAsync: z.literal(true),
   status: z.literal("async_launched"),
@@ -400,13 +389,11 @@ export const TaskAsyncToolUseResult = z.object({
   outputFile: z.string(),
 });
 
-/** Result from the Task (Agent) tool — either sync (completed) or async (launched in background). */
 export const TaskToolUseResult = z.union([
   TaskSyncToolUseResult,
   TaskAsyncToolUseResult,
 ]);
 
-/** Info about a subagent task retrieved via TaskOutput. */
 export const AgentTaskInfo = z.object({
   task_id: z.string(),
   /** Always `"agent"` for subagent tasks. */
@@ -422,7 +409,6 @@ export const AgentTaskInfo = z.object({
   result: z.string(),
 });
 
-/** Info about a background Bash task retrieved via TaskOutput. */
 export const BackgroundTaskInfo = z.object({
   task_id: z.string(),
   /** Always `"bash"` for background shell tasks. */
@@ -435,17 +421,14 @@ export const BackgroundTaskInfo = z.object({
   exitCode: z.number().nullable(),
 });
 
-/** Info about a running or completed task — either a subagent or background Bash command. */
 export const TaskInfo = z.union([AgentTaskInfo, BackgroundTaskInfo]);
 
-/** Result from the TaskOutput tool (retrieving output from a running/completed task). */
 export const TaskOutputToolUseResult = z.object({
   /** e.g. `"success"`, `"not_found"`. */
   retrieval_status: z.string(),
   task: TaskInfo,
 });
 
-/** Result from the TaskCreate tool. */
 export const TaskCreateToolUseResult = z.object({
   task: z.object({
     id: z.string(),
@@ -453,7 +436,6 @@ export const TaskCreateToolUseResult = z.object({
   }).strict(),
 });
 
-/** Result from the TaskUpdate tool. */
 export const TaskUpdateToolUseResult = z.object({
   success: z.boolean(),
   taskId: z.string(),
@@ -465,7 +447,6 @@ export const TaskUpdateToolUseResult = z.object({
     .optional(),
 });
 
-/** A single task entry in a TaskList result. */
 export const TaskListEntry = z.object({
   id: z.string(),
   subject: z.string(),
@@ -474,19 +455,16 @@ export const TaskListEntry = z.object({
   blockedBy: z.array(z.string()),
 });
 
-/** Result from the TaskList tool. */
 export const TaskListToolUseResult = z.object({
   tasks: z.array(TaskListEntry),
 });
 
-/** Result from the TaskStop tool (stopping a running task or background command). */
 export const TaskStopToolUseResult = z.object({
   message: z.string(),
   task_id: z.string(),
   task_type: z.string(),
 });
 
-/** Result from the WebFetch tool (fetching a URL). */
 export const WebFetchToolUseResult = z.object({
   /** Response body size in bytes. */
   bytes: z.number(),
@@ -500,25 +478,21 @@ export const WebFetchToolUseResult = z.object({
   url: z.string(),
 });
 
-/** A single link from web search results. */
 export const WebSearchResultLink = z.object({
   title: z.string(),
   url: z.string(),
 });
 
-/** Structured web search result containing an array of links. */
 export const WebSearchStructuredResult = z.object({
   tool_use_id: z.string(),
   content: z.array(WebSearchResultLink),
 });
 
-/** A web search result item — either a plain string summary or a structured result with links. */
 export const WebSearchResultItem = z.union([
   z.string(),
   WebSearchStructuredResult,
 ]);
 
-/** Result from the WebSearch tool. */
 export const WebSearchToolUseResult = z.object({
   durationSeconds: z.number(),
   /** The search query that was executed. */
@@ -526,13 +500,11 @@ export const WebSearchToolUseResult = z.object({
   results: z.array(WebSearchResultItem),
 });
 
-/** An option in an AskUserQuestion prompt. */
 export const QuestionOption = z.object({
   label: z.string(),
   description: z.string(),
 });
 
-/** A single question presented to the user via AskUserQuestion. */
 export const QuestionSpec = z.object({
   question: z.string(),
   /** Header text displayed above the question. */
@@ -542,13 +514,11 @@ export const QuestionSpec = z.object({
   options: z.array(QuestionOption),
 });
 
-/** Result from the AskUserQuestion tool. */
 export const AskUserQuestionToolUseResult = z.object({
   questions: z.array(QuestionSpec),
   answers: z.record(z.string(), z.string()),
 });
 
-/** Result from the Skill tool (invoking a slash command). */
 export const SkillToolUseResult = z.object({
   success: z.boolean(),
   /** The slash command name (e.g. `"commit"`, `"review-pr"`). */
@@ -557,7 +527,6 @@ export const SkillToolUseResult = z.object({
   allowedTools: z.array(z.string()).optional(),
 });
 
-/** Result from the ExitPlanMode tool (user approved the plan). */
 export const ExitPlanModeToolUseResult = z.object({
   /** Path to the plan file (e.g. `~/.claude/plans/<slug>.md`). */
   filePath: z.string(),
@@ -812,7 +781,6 @@ export const ThinkingBlock = z.object({
 
 // -- Tool use input schemas (built-in tools) --
 
-/** Input for the Bash tool — executes shell commands. */
 export const BashToolInput = z.object({
   /** The shell command to execute. */
   command: z.string(),
@@ -833,7 +801,6 @@ export const BashToolInput = z.object({
     .optional(),
 });
 
-/** Input for the Read tool — reads files from the filesystem. */
 export const ReadToolInput = z.object({
   /** Absolute path to the file to read. */
   file_path: z.string(),
@@ -845,13 +812,11 @@ export const ReadToolInput = z.object({
   pages: z.string().optional(),
 });
 
-/** Input for the Write tool — creates or overwrites files. */
 export const WriteToolInput = z.object({
   file_path: z.string(),
   content: z.string(),
 });
 
-/** Input for the Edit tool — performs exact string replacements in files. */
 export const EditToolInput = z.object({
   file_path: z.string(),
   /** The exact text to find and replace. Must be unique in the file unless `replace_all` is set. */
@@ -862,7 +827,6 @@ export const EditToolInput = z.object({
   replace_all: z.boolean().optional(),
 });
 
-/** Input for the NotebookEdit tool — edits Jupyter notebook cells. */
 export const NotebookEditToolInput = z.object({
   notebook_path: z.string(),
   /** New cell source code or markdown. */
@@ -875,7 +839,6 @@ export const NotebookEditToolInput = z.object({
   cell_id: z.string().optional(),
 });
 
-/** Input for the Glob tool — finds files by pattern. */
 export const GlobToolInput = z.object({
   /** Glob pattern (e.g. `"**\/*.ts"`, `"src/**\/*.tsx"`). */
   pattern: z.string(),
@@ -883,7 +846,6 @@ export const GlobToolInput = z.object({
   path: z.string().optional(),
 });
 
-/** Input for the Grep tool — searches file contents using ripgrep. */
 export const GrepToolInput = z.object({
   /** Regular expression pattern to search for. */
   pattern: z.string(),
@@ -914,7 +876,6 @@ export const GrepToolInput = z.object({
   "-n": z.boolean().optional(),
 });
 
-/** Input for the Task (Agent) tool — launches a subagent to handle complex tasks. */
 export const TaskToolInput = z.object({
   /** The task description/prompt for the subagent. */
   prompt: z.string(),
@@ -932,7 +893,6 @@ export const TaskToolInput = z.object({
   max_turns: z.number().optional(),
 });
 
-/** Input for the TaskOutput tool — retrieves output from a running/completed task. */
 export const TaskOutputToolInput = z.object({
   task_id: z.string(),
   /** Block until the task completes. */
@@ -941,7 +901,6 @@ export const TaskOutputToolInput = z.object({
   timeout: z.number().optional(),
 });
 
-/** Input for the TaskCreate tool — creates a tracked task item. */
 export const TaskCreateToolInput = z.object({
   subject: z.string(),
   description: z.string(),
@@ -950,12 +909,10 @@ export const TaskCreateToolInput = z.object({
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
-/** Input for the TaskGet tool — retrieves a single task by ID. */
 export const TaskGetToolInput = z.object({
   taskId: z.string(),
 });
 
-/** Input for the TaskUpdate tool — updates fields on an existing task. */
 export const TaskUpdateToolInput = z.object({
   taskId: z.string(),
   status: z.string().optional(),
@@ -970,24 +927,20 @@ export const TaskUpdateToolInput = z.object({
   addBlockedBy: z.array(z.string()).optional(),
 });
 
-/** Input for the TaskList tool — lists all tracked tasks. */
 export const TaskListToolInput = z.object({});
 
-/** Input for the TaskStop tool — stops a running task or background command. */
 export const TaskStopToolInput = z.object({
   task_id: z.string().optional(),
   /** Legacy: shell ID for background Bash commands. */
   shell_id: z.string().optional(),
 });
 
-/** Input for the WebFetch tool — fetches a URL and extracts content. */
 export const WebFetchToolInput = z.object({
   url: z.string(),
   /** Instructions for how to process the fetched content. */
   prompt: z.string(),
 });
 
-/** Input for the WebSearch tool — performs a web search. */
 export const WebSearchToolInput = z.object({
   query: z.string(),
   /** Only return results from these domains. */
@@ -996,13 +949,11 @@ export const WebSearchToolInput = z.object({
   blocked_domains: z.array(z.string()).optional(),
 });
 
-/** A selectable option in an AskUserQuestion input. */
 export const AskUserQuestionInputOption = z.object({
   label: z.string(),
   description: z.string().optional(),
 });
 
-/** A single question item in an AskUserQuestion input. */
 export const AskUserQuestionInputItem = z.object({
   question: z.string(),
   /** Header text displayed above the question. */
@@ -1011,7 +962,6 @@ export const AskUserQuestionInputItem = z.object({
   multiSelect: z.boolean().optional(),
 });
 
-/** Input for the AskUserQuestion tool — presents an interactive question to the user. */
 export const AskUserQuestionToolInput = z.object({
   questions: z.array(AskUserQuestionInputItem),
   /** Pre-filled answers (for programmatic use). */
@@ -1024,7 +974,6 @@ export const AskUserQuestionToolInput = z.object({
     .optional(),
 });
 
-/** Input for the Skill tool — invokes a slash command. */
 export const SkillToolInput = z.object({
   /** Skill name (e.g. `"commit"`, `"review-pr"`). */
   skill: z.string(),
@@ -1040,7 +989,6 @@ export const ExitPlanModeAllowedPrompt = z.object({
   prompt: z.string(),
 });
 
-/** Input for the ExitPlanMode tool — exits plan mode with the completed plan. */
 export const ExitPlanModeToolInput = z.object({
   /** The full plan markdown content. */
   plan: z.string().optional(),
@@ -1053,7 +1001,6 @@ export const ExitPlanModeToolInput = z.object({
   remoteSessionTitle: z.string().optional(),
 });
 
-/** Input for the EnterPlanMode tool — enters plan mode (no parameters). */
 export const EnterPlanModeToolInput = z.object({});
 
 // -- Fallback for MCP / plugin tools --
