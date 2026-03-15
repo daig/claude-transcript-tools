@@ -148,14 +148,21 @@ export const UserImageBlock = z.object({
   }),
 });
 
+/** Reference to a deferred tool, returned by the ToolSearch tool. */
+export const ToolReferenceBlock = z.object({
+  type: z.literal("tool_reference"),
+  tool_name: z.string(),
+});
+
 /**
  * Tool result with structured array content — multi-block responses containing
- * text blocks (subagent output) and/or image blocks (visual tool results).
+ * text blocks (subagent output), image blocks (visual tool results), and/or
+ * tool reference blocks (ToolSearch results).
  */
 export const ArrayToolResultBlock = z.object({
   type: z.literal("tool_result"),
   tool_use_id: z.string(),
-  content: z.array(z.union([UserTextBlock, UserImageBlock])),
+  content: z.array(z.union([UserTextBlock, UserImageBlock, ToolReferenceBlock])),
   is_error: z.boolean().optional(),
 });
 
@@ -277,8 +284,10 @@ export const Usage = z.object({
   cache_creation: CacheCreation.optional(),
   output_tokens: z.number(),
   service_tier: z.string().nullable().optional(),
-  inference_geo: z.string().optional(),
+  inference_geo: z.string().nullable().optional(),
   server_tool_use: ServerToolUse.optional(),
+  iterations: z.array(z.unknown()).nullable().optional(),
+  speed: z.string().nullable().optional(),
 });
 
 export const TaskSyncToolUseResult = z.object({
@@ -558,6 +567,7 @@ const UserBase = {
   sourceToolUseID: z.string().optional(),
   isVisibleInTranscriptOnly: z.boolean().optional(),
   isCompactSummary: z.boolean().optional(),
+  promptId: z.string().uuid().optional(),
 };
 
 export const HumanPromptLine = z
@@ -574,6 +584,11 @@ export const HumanPromptLine = z
   })
   .strict();
 
+/** Structured content from MCP tool responses that declare an `outputSchema`. */
+export const McpMeta = z.object({
+  structuredContent: z.record(z.string(), z.unknown()),
+});
+
 export const ToolResultLine = z
   .object({
     ...UserBase,
@@ -583,6 +598,7 @@ export const ToolResultLine = z
     }),
     toolUseResult: ToolUseResult,
     sourceToolAssistantUUID: z.string(),
+    mcpMeta: McpMeta.optional(),
   })
   .strict();
 
@@ -1151,6 +1167,16 @@ export const QueueOperationLine = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Type 8: last-prompt
+// ---------------------------------------------------------------------------
+
+export const LastPromptLine = z.object({
+  type: z.literal("last-prompt"),
+  lastPrompt: z.string(),
+  sessionId: z.string(),
+});
+
+// ---------------------------------------------------------------------------
 // Validation helper
 // ---------------------------------------------------------------------------
 
@@ -1210,6 +1236,7 @@ export function validateLine(obj: unknown): {
     assistant: AssistantLine,
     progress: ProgressLine,
     "queue-operation": QueueOperationLine,
+    "last-prompt": LastPromptLine,
   };
 
   let schema: z.ZodTypeAny | undefined = simpleSchemas[t];
@@ -1299,7 +1326,8 @@ export type TranscriptLineType =
   | z.infer<typeof AssistantLine>
   | z.infer<typeof SystemLine>
   | z.infer<typeof ProgressLine>
-  | z.infer<typeof QueueOperationLine>;
+  | z.infer<typeof QueueOperationLine>
+  | z.infer<typeof LastPromptLine>;
 
 export type SummaryLineType = z.infer<typeof SummaryLine>;
 export type FileHistorySnapshotLineType = z.infer<typeof FileHistorySnapshotLine>;
@@ -1313,6 +1341,7 @@ export type AssistantLineType = z.infer<typeof AssistantLine>;
 export type SystemLineType = z.infer<typeof SystemLine>;
 export type ProgressLineType = z.infer<typeof ProgressLine>;
 export type QueueOperationLineType = z.infer<typeof QueueOperationLine>;
+export type LastPromptLineType = z.infer<typeof LastPromptLine>;
 export type ContentBlockType = z.infer<typeof ContentBlock>;
 export type UsageType = z.infer<typeof Usage>;
 export type SessionIndexType = z.infer<typeof SessionIndex>;
