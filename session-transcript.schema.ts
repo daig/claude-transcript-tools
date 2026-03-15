@@ -64,32 +64,11 @@ export const FileHistorySnapshotLine = z.object({
 // Type 3: user (human prompts + tool results)
 // ---------------------------------------------------------------------------
 
-/** A text pattern that triggers extended thinking (legacy format, pre-v2.1.15). */
-export const ThinkingTrigger = z.object({
-  /** Start offset in the prompt text. */
-  start: z.number(),
-  /** End offset in the prompt text. */
-  end: z.number(),
-  /** The trigger text that was matched. */
-  text: z.string(),
+/** Extended thinking configuration at the time of a user prompt. */
+export const ThinkingMetadata = z.object({
+  /** Maximum tokens allocated for extended thinking. */
+  maxThinkingTokens: z.number(),
 });
-
-/**
- * Extended thinking configuration at the time of a user prompt.
- * Two formats exist: `{ maxThinkingTokens }` (v2.1.15+) or the legacy
- * `{ level, disabled, triggers }` format (v2.1.2–v2.1.14).
- */
-export const ThinkingMetadata = z.union([
-  z.object({ /** Maximum tokens allocated for extended thinking. */ maxThinkingTokens: z.number() }),
-  z.object({
-    /** Thinking level (legacy). */
-    level: z.string(),
-    /** Whether thinking is disabled (legacy). */
-    disabled: z.boolean(),
-    /** Text patterns that triggered thinking (legacy). */
-    triggers: z.array(ThinkingTrigger),
-  }),
-]);
 
 // -- Persisted output (large tool results stored externally) --
 
@@ -588,26 +567,6 @@ export const ExitPlanModeToolUseResult = z.object({
   plan: z.string(),
 });
 
-/** A single item in the legacy todo list. */
-export const TodoItem = z.object({
-  content: z.string(),
-  /** e.g. `"pending"`, `"in_progress"`, `"completed"`. */
-  status: z.string(),
-  /** Display form of the status. */
-  activeForm: z.string(),
-});
-
-/** @deprecated Legacy tool, replaced by TaskCreate/TaskUpdate/TaskList. */
-export const TodoWriteToolUseResult = z.object({
-  oldTodos: z.array(TodoItem),
-  newTodos: z.array(TodoItem),
-});
-
-/** @deprecated Legacy tool, replaced by TaskStop. */
-export const KillShellToolUseResult = z.object({
-  message: z.string(),
-  shell_id: z.string(),
-});
 
 /** Result from an MCP server or plugin-provided tool (object shape). */
 export const ExternalToolUseResult = z.record(z.string(), z.unknown());
@@ -704,7 +663,6 @@ export const ToolUseResult = z.union([
   TaskUpdateToolUseResult,
   TaskListToolUseResult,
   TaskStopToolUseResult,
-  TodoWriteToolUseResult,
   // Web
   WebFetchToolUseResult,
   WebSearchToolUseResult,
@@ -712,8 +670,6 @@ export const ToolUseResult = z.union([
   AskUserQuestionToolUseResult,
   SkillToolUseResult,
   ExitPlanModeToolUseResult,
-  // Legacy
-  KillShellToolUseResult,
   // Error (string)
   z.string(),
   // MCP / plugin tools — content-block array (raw MCP server response)
@@ -777,8 +733,6 @@ export const HumanPromptLine = z
     }),
     /** Extended thinking configuration at the time of the prompt. */
     thinkingMetadata: ThinkingMetadata.optional(),
-    /** Snapshot of the todo/task list at message time. */
-    todos: z.array(TodoItem).optional(),
     /** Permission level: `"default"`, `"plan"`, `"acceptEdits"`, etc. */
     permissionMode: z.string().optional(),
     /** Plan markdown content (on "Implement the following plan:" messages, v2.1.22+). */
@@ -827,7 +781,6 @@ export const RichContentLine = z
     }),
     sourceToolAssistantUUID: z.string().optional(),
     thinkingMetadata: ThinkingMetadata.optional(),
-    todos: z.array(TodoItem).optional(),
     permissionMode: z.string().optional(),
     imagePasteIds: z.array(z.number()).optional(),
   })
@@ -1103,18 +1056,6 @@ export const ExitPlanModeToolInput = z.object({
 /** Input for the EnterPlanMode tool — enters plan mode (no parameters). */
 export const EnterPlanModeToolInput = z.object({});
 
-// -- Legacy tool inputs --
-
-/** @deprecated Legacy tool, replaced by TaskCreate/TaskUpdate/TaskList. */
-export const TodoWriteToolInput = z.object({
-  todos: z.array(TodoItem),
-});
-
-/** @deprecated Legacy tool, replaced by TaskStop. */
-export const KillShellToolInput = z.object({
-  shell_id: z.string().optional(),
-});
-
 // -- Fallback for MCP / plugin tools --
 
 /** Input from an MCP server or plugin-provided tool (object shape). */
@@ -1144,8 +1085,6 @@ export const toolInputSchemas: Record<string, z.ZodTypeAny> = {
   Skill: SkillToolInput,
   ExitPlanMode: ExitPlanModeToolInput,
   EnterPlanMode: EnterPlanModeToolInput,
-  TodoWrite: TodoWriteToolInput,
-  KillShell: KillShellToolInput,
 };
 
 // -- ToolUseBlock with name↔input correlation via .superRefine() --
